@@ -24,6 +24,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
 
+IS_DEBUG = True
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -48,7 +49,8 @@ class WaypointUpdater(object):
         # rospy.spin()
 
         # new version: loop --> gives control about publishing frequency
-        self.loop()
+        rospy.loginfo("Starting waypoint uploader...")
+        self.loop()        
 
     # main loop
     # results will be received by waypoint follower, which runs at 30 Hz
@@ -59,7 +61,16 @@ class WaypointUpdater(object):
             if self.pose and self.base_waypoints:
                 # get closest waypoint
                 closest_waypoint_idx = self.get_closes_waypoint_id()
-                self.publish_waypoints(closest_waypoint_idx)
+                self.publish_waypoints(closest_waypoint_idx)                                
+                if IS_DEBUG:
+                    rospy.loginfo("waypoint running")
+            else:
+                if IS_DEBUG:
+                    if not self.pose:
+                        rospy.loginfo("Could not load pose")
+                    if not self.base_waypoints:
+                        rospy.loginfo("Could not load waypoints")
+            #self.publish_waypoints(1)
             rate.sleep()
 
     def get_closest_waypoint_id(self):
@@ -83,6 +94,9 @@ class WaypointUpdater(object):
         if val > 0:
             closest_idx = (closest_idx + 1) % len(self.waypoints_2d)
         
+        if IS_DEBUG:
+            rospy.loginfo("Closest waypoint: [idx=%d posx=%f posy=%f]", closest_idx, closest_coord[1], closest_coord[2])
+
         return closest_idx
 
     # publish waypoints between closest_idx and LOOKAHEAD_WPS 
