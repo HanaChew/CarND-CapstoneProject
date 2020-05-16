@@ -80,7 +80,7 @@ class WaypointUpdater(object):
         # if vector(cl_vect - prev_vect) * vector(pos_vect - cl_vect) are in same directions, 
         # dot-product will be > 0
         val = np.dot(cl_vect - prev_vect, pos_vect - cl_vect)
-        if val > 0
+        if val > 0:
             closest_idx = (closest_idx + 1) % len(self.waypoints_2d)
         
         return closest_idx
