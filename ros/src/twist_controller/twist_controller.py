@@ -2,7 +2,7 @@
 import rospy
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
-IS_DEBUG = True
+IS_DEBUG = False
 from yaw_controller import YawController
 from pid import PID
 from lowpass import LowPassFilter
@@ -67,12 +67,12 @@ class Controller(object):
         # get lowpass-filtered velocity
         current_vel = self.vel_lpf.filt(current_vel)
 
-        #if IS_DEBUG:
-        #    rospy.loginfo("Angular vel: {0}".format(angular_vel))
-        #    rospy.loginfo("Target vel: {0}".format(linear_vel)
-        #    rospy.loginfo("Target ang vel: {0}".format(angular_vel))
-        #    rospy.loginfo("Current vel: {0}".format(current_vel))
-        #    rospy.loginfo("Filtered vel: {0}".format(self.vel_lpf.get()))
+        if IS_DEBUG:
+            rospy.loginfo("Angular vel: {0}".format(angular_vel))
+            rospy.loginfo("Target vel: {0}".format(linear_vel))
+            rospy.loginfo("Target ang vel: {0}".format(angular_vel))
+            rospy.loginfo("Current vel: {0}".format(current_vel))
+            rospy.loginfo("Filtered vel: {0}".format(self.vel_lpf.get()))
         
         steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
 
@@ -93,6 +93,9 @@ class Controller(object):
             throttle = 0
             decel = max(vel_error, self.decel_limit)                        # limit brake value
             brake = abs(decel) * self.vehicle_mass * self.wheel_radius      # torque = N * m = acceleration * mass * radius
+
+        if IS_DEBUG:
+            rospy.logwarn("vel error: {0}, throttle: {1}, brake: {2}".format(vel_error, throttle, brake))            
 
         # problem with this controller: 
         # by the time, car is away from waypoint, waypoint_follower send new commands
