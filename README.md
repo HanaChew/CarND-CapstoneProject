@@ -72,7 +72,9 @@ Architecture overview taken from Udacity class notes
 - implemented waypoint updater
 - added rospy.loginfo and rospy.logwarn for debugging
 - changed number of waypoints from 200 to 20 due to performance reasons (see videos below)
+
 Following video shows the performance with 200 waypoints:
+
 ![](/img/waypoint_200.gif)
 - steering is not published fast enough
 - even though, the received steering has another latency as well
