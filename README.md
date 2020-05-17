@@ -66,6 +66,17 @@ git push -u origin master
 Architecture overview taken from Udacity class notes
 
 ## Waypoint-Updater
+### Description
+As can be seen in the architecture picture, the node receives 
+- base waypoints
+- traffic_waypoints
+- current_pose
+and publishes
+- current_pose. 
+### First Part
+During the first part, only base_waypoints and current_pose are considered. Within the intialization, local variables are initialized and the `spin()` was changed to a `loop()` in order to gain more control on publishing frequency (50 Hz). 
+Within the loop, the closest waypoint from `base_waypoints` is calculated dependend on `current_pose`. This is done by inserting the 2d-coordinates of each waypoint to a KDTree and querying the first element. This result needs to be checked to be in front of the car by a dot-product. 
+Following things were done: 
 - changed callback functions
 - implemented waypoint updater
 - added rospy.loginfo and rospy.logwarn for debugging
@@ -80,4 +91,7 @@ Following video shows the performance with 200 waypoints:
 
 In order to tackle this problem, I changed number of waypoints to 20: 
 ![](/img/waypoint_20.gif)
+
+## Drive-by-Wire Node
+### Description
 
