@@ -23,6 +23,12 @@ cd /home/workspace/CarND-Capstone/ros
 rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
 ```
 These command lines are done within the script `/ros/update_ros_pkg`. After downloading, execute `chmod 755 update_ros_pkg`.
+After updating dbw package, there could be following error `st.steering_wheel_angle_cmd = val * math.pi/180.
+AttributeError: 'SteeringReport' object has no attribute 'steering_wheel_angle_cmd'`. This is because the attribute `steering_wheel_angle_cmd` got renamed to `steering_wheel_cmd` due to https://github.com/udacity/CarND-Capstone/pull/296. 
+Corrected occurences in following files: 
+- /ros/src/twist_controller/dbw_test.py, line 81
+- /ros/src/styx/bridge.py
+- /ros/src/twist_controller/dbw_node.py
 
 ## Pushing and Pulling to Github
 ### Global information
@@ -69,4 +75,3 @@ git push -u origin master
   - dependent on order of execution
   1. start simulator
   2. start ros launcher
-  
