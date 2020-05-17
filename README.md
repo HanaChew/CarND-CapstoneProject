@@ -22,3 +22,26 @@ sudo apt-get install -y ros-kinetic-dbw-mkz-msgs
 cd /home/workspace/CarND-Capstone/ros
 rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
 ```
+
+## Pushing and Pulling to Github
+### Global information
+```shell
+git config --global user.email "info@slieter.de"
+git config --global user.name "DanielStuttgart"
+```
+### Initiating a new repo
+```shell
+git init
+git add *
+git commit -m "first commit"
+git remote add origin https://github.com/DanielStuttgart/CarND_Capstone.git
+git push -u origin master
+```
+### Cloning, Changing and Pushing
+```shell
+git clone https://github.com/DanielStuttgart/CarND_Capstone.git
+# do changes
+git add *
+git commit -m "some changes"
+git push -u origin master
+```
