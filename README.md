@@ -22,6 +22,7 @@ sudo apt-get install -y ros-kinetic-dbw-mkz-msgs
 cd /home/workspace/CarND-Capstone/ros
 rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
 ```
+These command lines are done within the script `/ros/update_ros_pkg`. After downloading, execute `chmod 755 update_ros_pkg`.
 
 ## Pushing and Pulling to Github
 ### Global information
@@ -29,6 +30,7 @@ rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
 git config --global user.email "info@slieter.de"
 git config --global user.name "DanielStuttgart"
 ```
+These command lines are done within the script `/ros/init_git`.
 ### Initiating a new repo
 ```shell
 git init
