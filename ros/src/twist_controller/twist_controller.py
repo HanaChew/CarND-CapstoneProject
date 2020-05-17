@@ -1,7 +1,11 @@
 
+import rospy
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
 IS_DEBUG = True
+from yaw_controller import YawController
+from pid import PID
+from lowpass import LowPassFilter
 
 class Controller(object):
     #def __init__(self, *args, **kwargs):
@@ -63,12 +67,12 @@ class Controller(object):
         # get lowpass-filtered velocity
         current_vel = self.vel_lpf.filt(current_vel)
 
-        if IS_DEBUG:
-            rospy.loginfo("Angular vel: {0}".format(angular_vel))
-            rospy.loginfo("Target vel: {0}".format(linear_vel)
-            rospy.loginfo("Target ang vel: {0}".format(angular_vel))
-            rospy.loginfo("Current vel: {0}".format(current_vel))
-            rospy.loginfo("Filtered vel: {0}".format(self.vel_lpf.get()))
+        #if IS_DEBUG:
+        #    rospy.loginfo("Angular vel: {0}".format(angular_vel))
+        #    rospy.loginfo("Target vel: {0}".format(linear_vel)
+        #    rospy.loginfo("Target ang vel: {0}".format(angular_vel))
+        #    rospy.loginfo("Current vel: {0}".format(current_vel))
+        #    rospy.loginfo("Filtered vel: {0}".format(self.vel_lpf.get()))
         
         steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
 
