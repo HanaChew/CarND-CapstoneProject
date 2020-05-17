@@ -60,6 +60,7 @@ git push -u origin master
 ## Waypoint-Updater
 - changed callback functions
 - added rospy.login for debugging
+  - logging to `/root/.ros/log/8c8d45f6-9811-11ea-8784-0242ac110002/`
 - `rostopic list` shows /final_waypoints
 - `rostopic info /final_waypoints` shows correct type and architecture
 - `rostopic echo /final_waypoints` does not show any waypoints 
