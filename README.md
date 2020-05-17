@@ -41,9 +41,17 @@ git push -u origin master
 ```
 ### Cloning, Changing and Pushing
 ```shell
+## Clone for first time only
 git clone https://github.com/DanielStuttgart/CarND_Capstone.git
 # do changes
 git add *
 git commit -m "some changes"
 git push -u origin master
 ```
+```shell
+## Pull request
+git pull origin master
+# do changes
+git add *
+git commit -m "some changes"
+git push -u origin master
