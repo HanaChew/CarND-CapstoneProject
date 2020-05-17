@@ -63,6 +63,9 @@ git push -u origin master
 - `rostopic list` shows /final_waypoints
 - `rostopic info /final_waypoints` shows correct type and architecture
 - `rostopic echo /final_waypoints` does not show any waypoints 
-- current_pose is not called and pose is not set
+- current_pose is not published, callback not called and internal variable pose is not set
   - `rostopic echo /current_pose` results in WARNING: topic does not appear to be published yet
-
+  - dependent on order of execution
+  1. start simulator
+  2. start ros launcher
+  
