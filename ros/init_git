@@ -1,0 +1,3 @@
+# script to initialize git
+git config --global user.email "info@slieter.de"
+git config --global user.name "DanielStuttgart"
