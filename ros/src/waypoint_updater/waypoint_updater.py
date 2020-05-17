@@ -113,6 +113,8 @@ class WaypointUpdater(object):
 
     # Store received msg to internal waypoints
     def waypoints_cb(self, waypoints):
+        if IS_DEBUG:
+            rospy.loginfo('Writing base_waypoints.')
         self.base_waypoints = waypoints     # latched Subscriber --> callback called once for base waypoints
         # initialize waypoints_2d before the subscriber is initialized; avoid race-conditions
         if not self.waypoints_2d:
