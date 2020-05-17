@@ -63,15 +63,21 @@ git commit -m "some changes"
 git push -u origin master
 ```
 
+## General overview
+![](/img/final-project-ros-graph-v2.png)
+Architecture overview taken from Udacity class notes
+
 ## Waypoint-Updater
 - changed callback functions
-- added rospy.login for debugging
-  - logging to `/root/.ros/log/8c8d45f6-9811-11ea-8784-0242ac110002/`
-- `rostopic list` shows /final_waypoints
-- `rostopic info /final_waypoints` shows correct type and architecture
-- `rostopic echo /final_waypoints` does not show any waypoints 
-- current_pose is not published, callback not called and internal variable pose is not set
-  - `rostopic echo /current_pose` results in WARNING: topic does not appear to be published yet
-  - dependent on order of execution
-  1. start simulator
-  2. start ros launcher
+- implemented waypoint updater
+- added rospy.loginfo and rospy.logwarn for debugging
+- changed number of waypoints from 200 to 20 due to performance reasons (see videos below)
+Following video shows the performance with 200 waypoints:
+![](/img/waypoint_200.gif)
+- steering is not published fast enough
+- even though, the received steering has another latency as well
+- waypoints are not updated fast enough
+
+In order to tackle this problem, I changed number of waypoints to 20: 
+![](/img/waypoint_20.gif)
+
