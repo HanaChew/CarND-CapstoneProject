@@ -41,6 +41,7 @@ git init
 git add *
 git commit -m "first commit"
 git remote add origin https://github.com/DanielStuttgart/CarND_Capstone.git
+#https://github.com/shaundaley39/CarND-Capstone.git
 git push -u origin master
 ```
 ### Cloning, Changing and Pushing
