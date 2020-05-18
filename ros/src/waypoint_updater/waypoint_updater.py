@@ -3,6 +3,7 @@
 import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
+from std_msgs.msg import Int32
 from scipy.spatial import KDTree
 
 import math
@@ -37,7 +38,7 @@ class WaypointUpdater(object):
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
-        rospy.Subscriber('/traffic_waypoint', int32, self.traffic_cb)
+        rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 
@@ -69,7 +70,7 @@ class WaypointUpdater(object):
             if self.pose and self.waypoints_tree:
                 # get closest waypoint
                 closest_waypoint_idx = self.get_closest_waypoint_id()
-                self.publish_waypoints(closest_waypoint_idx)                                
+                self.publish_waypoints()                                
                 if IS_DEBUG:
                     rospy.loginfo("Waypoint Idx {0}".format(closest_waypoint_idx))
             else:
@@ -107,15 +108,6 @@ class WaypointUpdater(object):
 
         return closest_idx
 
-    # publish waypoints between closest_idx and LOOKAHEAD_WPS 
-    def publish_waypoints(self):
-        #lane = Lane()
-        #lane.header = self.base_waypoints.header        
-        # no manual slicing needed due to python slicing
-        #lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
-        final_lane = generate_lane()
-        self.final_waypoints_pub.publish(final_lane)
-
     # generate lane object depending on decelerating for a stopline or not
     def generate_lane(self):
         lane = Lane()
@@ -130,6 +122,15 @@ class WaypointUpdater(object):
             lane.waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
 
         return lane
+
+    # publish waypoints between closest_idx and LOOKAHEAD_WPS 
+    def publish_waypoints(self):
+        #lane = Lane()
+        #lane.header = self.base_waypoints.header        
+        # no manual slicing needed due to python slicing
+        #lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
+        final_lane = self.generate_lane()
+        self.final_waypoints_pub.publish(final_lane)
 
     def decelerate_waypoints(self, waypoints, closest_idx):
         temp = []
