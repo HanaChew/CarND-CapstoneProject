@@ -109,7 +109,9 @@ class TLDetector(object):
 
         """
         #TODO implement
-        closest_idx = self.waypoints_tree.query([x,y], 1)[1]
+        closest_idx = 0
+        if self.waypoints_tree:
+            closest_idx = self.waypoints_tree.query([x,y], 1)[1]
         return closest_idx
 
     def get_light_state(self, light):
@@ -144,8 +146,8 @@ class TLDetector(object):
         line_wp_idx = None
 
         # List of positions that correspond to the line to stop in front of for a given intersection
-        stop_line_positions = self.config['stop_line_positions']
-        if(self.pose):
+        stop_line_positions = self.config['stop_line_positions']        
+        if(self.pose and self.waypoints_tree):            
             #car_position = self.get_closest_waypoint(self.pose.pose)
             car_wp_idx = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y)
 
@@ -159,13 +161,14 @@ class TLDetector(object):
                 d = temp_wp_idx - car_wp_idx
                 # if index of traffic light is larger than car, it will be in front of car
                 # find lowest difference == closest temp waypoint in front of car
-                if d >= 0 and d < diff:     
+                if d >= 0 and d < diff:                         
                     diff = d
                     closest_light = light
                     line_wp_idx = temp_wp_idx
 
-        if closest_light:
+        if closest_light:            
             state = self.get_light_state(closest_light)
+            rospy.logwarn("found a light WP: {0}, state: {1}".format(line_wp_idx, state))
             return line_wp_idx, state
 
         self.waypoints = None
