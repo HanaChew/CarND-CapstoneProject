@@ -88,7 +88,8 @@ class Controller(object):
 
         if linear_vel == 0. and current_vel < 0.1:
             throttle = 0
-            brake = 400 # Nm --> needed to hold car in place if we are at a light, resulting acceleration = -1 m/s^2
+            # brake = 400 # Nm --> needed to hold car in place if we are at a light, resulting acceleration = -1 m/s^2
+            brake = 700 # Nm --> needed to hold car in place if we are at a light, resulting acceleration = -1 m/s^2
         elif throttle < 0.1 and vel_error < 0:
             throttle = 0
             decel = max(vel_error, self.decel_limit)                        # limit brake value

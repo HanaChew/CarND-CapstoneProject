@@ -29,6 +29,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 LOOKAHEAD_WPS = 20 # Number of waypoints we will publish. You can change this number
 MAX_DECEL = 2       # deceleration value in front of traffic light
 WP_BEFORE_TRAFFICLIGHT = 3 # number of waypoints, where car stops in front of traffic light
+DECEL_RATE = 1
 
 IS_DEBUG = False
 
@@ -116,11 +117,9 @@ class WaypointUpdater(object):
         farthest_idx = closest_idx + LOOKAHEAD_WPS
         base_waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
 
-        #rospy.logwarn("WP_Stop: {0}, Farthest: {1}".format(self.stopline_wp_idx, farthest_idx))
         if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
             lane.waypoints = base_waypoints
-        else:           
-            rospy.logwarn("in deceleration") 
+        else:
             lane.waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
 
         return lane
@@ -134,23 +133,22 @@ class WaypointUpdater(object):
         final_lane = self.generate_lane()
         self.final_waypoints_pub.publish(final_lane)
 
-    def decelerate_waypoints(self, waypoints, closest_idx):        
+    def decelerate_waypoints(self, waypoints, closest_idx):
         temp = []
         for i, wp in enumerate(waypoints):
             p = Waypoint()
             p.pose = wp.pose
 
-            stop_idx = max(self.stopline_wp_idx - closest_idx - WP_BEFORE_TRAFFICLIGHT, 0)       # 2 waypoints back from line so front of car stops at line            
+            stop_idx = max(self.stopline_wp_idx - closest_idx - WP_BEFORE_TRAFFICLIGHT, 0)       # 2 waypoints back from line so front of car stops at line
             dist = self.distance(waypoints, i, stop_idx)
-            rospy.logwarn("Stopline: {0}, Closest: {1}, Dist: {2}".format(self.stopline_wp_idx, closest_idx, dist))
-            vel = math.sqrt(2 * MAX_DECEL * dist)               # may not be smooth; perhaps add linear deceleration
+            vel = math.sqrt(2 * MAX_DECEL * dist) + (DECEL_RATE*i) # added linear decel term to smooth
             if vel < 1.:
                 vel = 0
 
             p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
             temp.append(p)
-        
-        return p
+
+        return temp
 
 
     # Store received msg to internal pose; called at 50 Hz
@@ -173,7 +171,7 @@ class WaypointUpdater(object):
 
 
     def traffic_cb(self, msg):
-        # TODO: Callback for /traffic_waypoint message. Implement        
+        # TODO: Callback for /traffic_waypoint message. Implement
         self.stopline_wp_idx = msg.data
 
     def obstacle_cb(self, msg):
