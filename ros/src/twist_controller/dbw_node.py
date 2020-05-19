@@ -30,7 +30,7 @@ Once you have the proposed throttle, brake, and steer values, publish it on the 
 that we have created in the `__init__` function.
 
 '''
-
+IS_DEBUG = True
 class DBWNode(object):    
     def __init__(self):
         rospy.init_node('dbw_node')
@@ -55,6 +55,7 @@ class DBWNode(object):
 
         # TODO: Create `Controller` object
         # self.controller = Controller(<Arguments you wish to provide>)
+        # initialize controller with relevant data
         self.controller = Controller(vehicle_mass = vehicle_mass, 
                                         fuel_capacity = fuel_capacity,
                                         brake_deadband = brake_deadband, 
@@ -104,6 +105,8 @@ class DBWNode(object):
             
             if self.dbw_enabled:
                 self.publish(self.throttle, self.brake, self.steering)
+                if IS_DEBUG:
+                    rospy.logwarn("Publishing: Throttle: {0}, Brake: {1}, Steer: {2}".format(self.throttle, self.brake, self.steering))
 
             rate.sleep()
 
@@ -126,8 +129,7 @@ class DBWNode(object):
 
         scmd = SteeringCmd()
         scmd.enable = True
-        scmd.steering_wheel_angle_cmd = steer
-        #scmd.steering_wheel_cmd = steer
+        scmd.steering_wheel_angle_cmd = steer        
         self.steer_pub.publish(scmd)
 
         bcmd = BrakeCmd()

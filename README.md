@@ -25,10 +25,8 @@ rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
 These command lines are done within the script `/ros/update_ros_pkg`. After downloading, execute `chmod 755 update_ros_pkg`.
 After updating dbw package, there could be following error `st.steering_wheel_angle_cmd = val * math.pi/180.
 AttributeError: 'SteeringReport' object has no attribute 'steering_wheel_angle_cmd'`. This is because the attribute `steering_wheel_angle_cmd` got renamed to `steering_wheel_cmd` due to https://github.com/udacity/CarND-Capstone/pull/296. 
-Corrected occurences in following files: 
-- /ros/src/twist_controller/dbw_test.py, line 81
-- /ros/src/styx/bridge.py
-- /ros/src/twist_controller/dbw_node.py
+Corrected occurences in following file: 
+- /ros/src/styx/bridge.py, line 104
 
 ## Pushing and Pulling to Github
 ### Global information
@@ -43,6 +41,7 @@ git init
 git add *
 git commit -m "first commit"
 git remote add origin https://github.com/DanielStuttgart/CarND_Capstone.git
+#https://github.com/shaundaley39/CarND-Capstone.git
 git push -u origin master
 ```
 ### Cloning, Changing and Pushing
@@ -63,15 +62,37 @@ git commit -m "some changes"
 git push -u origin master
 ```
 
+## General overview
+![](/img/final-project-ros-graph-v2.png)
+Architecture overview taken from Udacity class notes
+
 ## Waypoint-Updater
+### Description
+As can be seen in the architecture picture, the node receives 
+- base waypoints
+- traffic_waypoints
+- current_pose
+and publishes
+- current_pose. 
+### First Part
+During the first part, only base_waypoints and current_pose are considered. Within the intialization, local variables are initialized and the `spin()` was changed to a `loop()` in order to gain more control on publishing frequency (50 Hz). 
+Within the loop, the closest waypoint from `base_waypoints` is calculated dependend on `current_pose`. This is done by inserting the 2d-coordinates of each waypoint to a KDTree and querying the first element. This result needs to be checked to be in front of the car by a dot-product. 
+Following things were done: 
 - changed callback functions
-- added rospy.login for debugging
-  - logging to `/root/.ros/log/8c8d45f6-9811-11ea-8784-0242ac110002/`
-- `rostopic list` shows /final_waypoints
-- `rostopic info /final_waypoints` shows correct type and architecture
-- `rostopic echo /final_waypoints` does not show any waypoints 
-- current_pose is not published, callback not called and internal variable pose is not set
-  - `rostopic echo /current_pose` results in WARNING: topic does not appear to be published yet
-  - dependent on order of execution
-  1. start simulator
-  2. start ros launcher
+- implemented waypoint updater
+- added rospy.loginfo and rospy.logwarn for debugging
+- changed number of waypoints from 200 to 20 due to performance reasons (see videos below)
+
+Following video shows the performance with 200 waypoints:
+
+![](/img/waypoint_200.gif)
+- steering is not published fast enough
+- even though, the received steering has another latency as well
+- waypoints are not updated fast enough
+
+In order to tackle this problem, I changed number of waypoints to 20: 
+![](/img/waypoint_20.gif)
+
+## Drive-by-Wire Node
+### Description
+
