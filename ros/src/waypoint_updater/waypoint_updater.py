@@ -29,6 +29,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 LOOKAHEAD_WPS = 20 # Number of waypoints we will publish. You can change this number
 MAX_DECEL = 2       # deceleration value in front of traffic light
 WP_BEFORE_TRAFFICLIGHT = 3 # number of waypoints, where car stops in front of traffic light
+DECEL_RATE = 1
 
 IS_DEBUG = False
 
@@ -140,14 +141,14 @@ class WaypointUpdater(object):
 
             stop_idx = max(self.stopline_wp_idx - closest_idx - WP_BEFORE_TRAFFICLIGHT, 0)       # 2 waypoints back from line so front of car stops at line
             dist = self.distance(waypoints, i, stop_idx)
-            vel = math.sqrt(2 * MAX_DECEL * dist)               # may not be smooth; perhaps add linear deceleration
+            vel = math.sqrt(2 * MAX_DECEL * dist) + (DECEL_RATE*i) # added linear decel term to smooth
             if vel < 1.:
                 vel = 0
 
             p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
             temp.append(p)
-        
-        return p
+
+        return temp
 
 
     # Store received msg to internal pose; called at 50 Hz
