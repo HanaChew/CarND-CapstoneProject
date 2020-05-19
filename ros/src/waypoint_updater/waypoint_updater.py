@@ -116,9 +116,11 @@ class WaypointUpdater(object):
         farthest_idx = closest_idx + LOOKAHEAD_WPS
         base_waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
 
+        #rospy.logwarn("WP_Stop: {0}, Farthest: {1}".format(self.stopline_wp_idx, farthest_idx))
         if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
             lane.waypoints = base_waypoints
-        else:
+        else:           
+            rospy.logwarn("in deceleration") 
             lane.waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
 
         return lane
@@ -132,14 +134,15 @@ class WaypointUpdater(object):
         final_lane = self.generate_lane()
         self.final_waypoints_pub.publish(final_lane)
 
-    def decelerate_waypoints(self, waypoints, closest_idx):
+    def decelerate_waypoints(self, waypoints, closest_idx):        
         temp = []
         for i, wp in enumerate(waypoints):
             p = Waypoint()
             p.pose = wp.pose
 
-            stop_idx = max(self.stopline_wp_idx - closest_idx - WP_BEFORE_TRAFFICLIGHT, 0)       # 2 waypoints back from line so front of car stops at line
+            stop_idx = max(self.stopline_wp_idx - closest_idx - WP_BEFORE_TRAFFICLIGHT, 0)       # 2 waypoints back from line so front of car stops at line            
             dist = self.distance(waypoints, i, stop_idx)
+            rospy.logwarn("Stopline: {0}, Closest: {1}, Dist: {2}".format(self.stopline_wp_idx, closest_idx, dist))
             vel = math.sqrt(2 * MAX_DECEL * dist)               # may not be smooth; perhaps add linear deceleration
             if vel < 1.:
                 vel = 0
@@ -170,7 +173,7 @@ class WaypointUpdater(object):
 
 
     def traffic_cb(self, msg):
-        # TODO: Callback for /traffic_waypoint message. Implement
+        # TODO: Callback for /traffic_waypoint message. Implement        
         self.stopline_wp_idx = msg.data
 
     def obstacle_cb(self, msg):
