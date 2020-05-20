@@ -93,6 +93,14 @@ Following video shows the performance with 200 waypoints:
 In order to tackle this problem, I changed number of waypoints to 20: 
 ![](/img/waypoint_20.gif)
 
+### Final Part with Traffic Lights
+In this part, the callback from traffic_waypoints was added. In order to be able to decelerate on traffic lights, the waypoints in front of a traffic light are calculated dependen on the traffic light's state and the distance to the traffic light. 
+Three alternative deceleration models were implemented: 
+- root-function
+$\frac{1}{n}$
+- root-funktion + linear component
+- sigmoidal function
+
 ## Drive-by-Wire Node
 ### Description
 
