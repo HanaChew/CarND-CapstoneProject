@@ -101,6 +101,7 @@ Three alternative deceleration models were implemented:
 - sigmoidal function
 
 $$ \frac{1}{n} $$
+<img src="https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1">
 
 ## Drive-by-Wire Node
 ### Description
