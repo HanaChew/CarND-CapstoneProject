@@ -178,10 +178,10 @@ class TLDetector(object):
         if closest_light:
             if self.USE_GROUND_TRUTH_TRAFFIC_LIGHT:
                 state = closest_light.state
-                rospy.logwarn("ground truth: found a light WP: {0}, state: {1}".format(line_wp_idx, state))
+                # rospy.logwarn("ground truth: found a light WP: {0}, state: {1}".format(line_wp_idx, state))
             else:
                 state = self.get_light_state(closest_light)
-                rospy.logwarn("detected a light WP: {0}, state: {1}".format(line_wp_idx, state))
+                # rospy.logwarn("detected a light WP: {0}, state: {1}".format(line_wp_idx, state))
             return line_wp_idx, state
 
         # self.waypoints = None

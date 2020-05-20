@@ -93,6 +93,20 @@ Following video shows the performance with 200 waypoints:
 In order to tackle this problem, I changed number of waypoints to 20: 
 ![](/img/waypoint_20.gif)
 
+### Final Part with Traffic Lights
+In this part, the callback from traffic_waypoints was added. In order to be able to decelerate on traffic lights, the waypoints in front of a traffic light are calculated dependen on the traffic light's state and the distance to the traffic light. 
+Three alternative deceleration models were implemented: 
+- root-function
+<img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d}">
+- root-funktion + linear component
+<img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d} %2B i \cdot f_{rate}">
+- sigmoidal function
+<img src="https://render.githubusercontent.com/render/math?math=v = \frac{1}{1 %2B e^{d %2B n_{\text{offset}}}} \cdot v_{des}">
+"+" used as escape sign in HTML --> used %2B
+
+![](/img/Deceleration_models.JPG)
+
+
 ## Drive-by-Wire Node
 ### Description
 
