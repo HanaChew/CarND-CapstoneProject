@@ -102,7 +102,6 @@ Three alternative deceleration models were implemented:
 <img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d} %2B i \cdot f_{rate}">
 - sigmoidal function
 <img src="https://render.githubusercontent.com/render/math?math=v = \frac{1}{1 %2B e^{d %2B n_{\text{offset}}}} \cdot v_{des}">
-<img src="https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1">
 "+" used as escape sign in HTML --> used %2B
 
 
