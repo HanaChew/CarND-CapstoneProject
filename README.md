@@ -97,10 +97,12 @@ In order to tackle this problem, I changed number of waypoints to 20:
 In this part, the callback from traffic_waypoints was added. In order to be able to decelerate on traffic lights, the waypoints in front of a traffic light are calculated dependen on the traffic light's state and the distance to the traffic light. 
 Three alternative deceleration models were implemented: 
 - root-function
-<img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \dot a_{max} \dot d}">
+<img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d}">
 - root-funktion + linear component
+<img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d} + i \cdot f_{rate}">
 - sigmoidal function
-
+<img src="https://render.githubusercontent.com/render/math?math=v = \frac{1}{1 + e^{d + n_{offset}}} * v_{des}">
+<img src="https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1">
 $$ \frac{1}{n} $$
 
 
