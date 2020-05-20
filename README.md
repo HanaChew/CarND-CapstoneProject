@@ -99,9 +99,9 @@ Three alternative deceleration models were implemented:
 - root-function
 <img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d}">
 - root-funktion + linear component
-<img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d} + i \cdot f_{rate}">
+<img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{2 \cdot a_{max} \cdot d} \+ i \cdot f_{rate}">
 - sigmoidal function
-<img src="https://render.githubusercontent.com/render/math?math=v = \frac{1}{1 + e^{d + n_{\text{offset}}}} * v_{des}">
+<img src="https://render.githubusercontent.com/render/math?math=v = \frac{1}{1 + e^{d \+ n_{\text{offset}}}} * v_{des}">
 <img src="https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1">
 $$ \frac{1}{n} $$
 
