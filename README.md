@@ -103,6 +103,7 @@ Three alternative deceleration models were implemented:
 - sigmoidal function
 <img src="https://render.githubusercontent.com/render/math?math=v = \frac{1}{1 %2B e^{d %2B n_{\text{offset}}}} \cdot v_{des}">
 "+" used as escape sign in HTML --> used %2B
+
 ![](/img/Deceleration_models.JPG)
 
 
