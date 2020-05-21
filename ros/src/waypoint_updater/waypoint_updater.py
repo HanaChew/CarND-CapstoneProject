@@ -30,11 +30,12 @@ LOOKAHEAD_WPS = 20 # Number of waypoints we will publish. You can change this nu
 MAX_DECEL = 2       # deceleration value in front of traffic light
 WP_BEFORE_TRAFFICLIGHT = 2 # number of waypoints, where car stops in front of traffic light
 DECEL_RATE = 1
-SIG_VEL = 24        # velocity == factor for sigmoid
-SIG_EXP = -0.12     # exponent for sigmoid
-SIG_OFFSET = - 25   # OFFSET for x-axis
+SIG_VEL = 9#24        # velocity == factor for sigmoid
+SIG_EXP = -0.43#-0.12     # exponent for sigmoid
+SIG_OFFSET = -3.72#- 25   # OFFSET for x-axis
+SIG_YOFFSET = -1.512    # OOFSET for y-axis
 
-IS_DEBUG = False
+IS_DEBUG = True
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -55,14 +56,14 @@ class WaypointUpdater(object):
         self.base_waypoints = None
         self.waypoints_2d = None
         self.waypoints_tree = None
-        self.stopline_wp_idx = -1        
+        self.stopline_wp_idx = -1
 
         # old version: rospy.spin()
         # rospy.spin()
 
         # new version: loop --> gives control about publishing frequency
         rospy.loginfo("Starting waypoint updater...")
-        self.loop()        
+        self.loop()
 
     # main loop
     # results will be received by waypoint follower, which runs at 30 Hz
@@ -74,7 +75,7 @@ class WaypointUpdater(object):
             if self.pose and self.waypoints_tree:
                 # get closest waypoint
                 closest_waypoint_idx = self.get_closest_waypoint_id()
-                self.publish_waypoints()                                
+                self.publish_waypoints()
                 if IS_DEBUG:
                     rospy.loginfo("Waypoint Idx {0}".format(closest_waypoint_idx))
             else:
@@ -101,13 +102,13 @@ class WaypointUpdater(object):
         prev_vect = np.array(prev_coord)
         pos_vect = np.array([x,y])
 
-        # if vector(cl_vect - prev_vect) * vector(pos_vect - cl_vect) are in same directions, 
+        # if vector(cl_vect - prev_vect) * vector(pos_vect - cl_vect) are in same directions,
         # dot-product will be > 0
         val = np.dot(cl_vect - prev_vect, pos_vect - cl_vect)
         if val > 0:
             closest_idx = (closest_idx + 1) % len(self.waypoints_2d)
-        
-        if IS_DEBUG: 
+
+        if IS_DEBUG:
             rospy.loginfo("Closest waypoint: [idx=%d posx=%f posy=%f]", closest_idx, closest_coord[0], closest_coord[1])
 
         return closest_idx
@@ -116,7 +117,7 @@ class WaypointUpdater(object):
     def generate_lane(self):
         lane = Lane()
         lane.header = self.base_waypoints.header
-        closest_idx = self.get_closest_waypoint_id()        
+        closest_idx = self.get_closest_waypoint_id()
         farthest_idx = closest_idx + LOOKAHEAD_WPS
         base_waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
 
@@ -127,10 +128,10 @@ class WaypointUpdater(object):
 
         return lane
 
-    # publish waypoints between closest_idx and LOOKAHEAD_WPS 
+    # publish waypoints between closest_idx and LOOKAHEAD_WPS
     def publish_waypoints(self):
         #lane = Lane()
-        #lane.header = self.base_waypoints.header        
+        #lane.header = self.base_waypoints.header
         # no manual slicing needed due to python slicing
         #lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
         final_lane = self.generate_lane()
@@ -145,9 +146,13 @@ class WaypointUpdater(object):
             stop_idx = max(self.stopline_wp_idx - closest_idx - WP_BEFORE_TRAFFICLIGHT, 0)       # 2 waypoints back from line so front of car stops at line
             dist = self.distance(waypoints, i, stop_idx)
             #vel = math.sqrt(2 * MAX_DECEL * dist) + (DECEL_RATE*i) # added linear decel term to smooth
-            vel = (1 / (1 + np.exp(SIG_EXP * (dist + SIG_OFFSET)))) * SIG_VEL
-            if vel < 1.:            
+            vel = (SIG_VEL / (1 + np.exp(SIG_EXP * (dist + SIG_OFFSET)))) + SIG_YOFFSET
+            if vel < 1.:
                 vel = 0
+
+            if IS_DEBUG:
+                rospy.loginfo("stop_idx: %d, dist: %f, vel: %f, waypoint.twist.twist.linear.x: %f]", stop_idx, dist, vel, wp.twist.twist.linear.x)
+
 
             p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
             temp.append(p)
