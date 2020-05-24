@@ -108,5 +108,6 @@ Three alternative deceleration models were implemented:
 
 
 ## Drive-by-Wire Node
+This node 
 ### Description
 
