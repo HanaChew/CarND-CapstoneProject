@@ -8,6 +8,7 @@ import time
 import os
 import cv2
 
+IS_DEBUG = True
 
 class TLClassifier(object):
 
@@ -17,7 +18,7 @@ class TLClassifier(object):
         self.tf_graph = None
         self.prediction = None
         self.model_path = '../../../models/'
-       
+
         self.load_model(is_real_world)
 
     def load_model(self, is_real_world):
@@ -32,7 +33,7 @@ class TLClassifier(object):
         # Loading the graph
         self.tf_graph = load_graph(self.model_path)
         self.config = tf.ConfigProto(log_device_placement=False)
-        
+
         # GPU video memory usage setup
         self.config.gpu_options.per_process_gpu_memory_fraction = 0.8
         #Setup timeout for any inactive option
@@ -44,7 +45,7 @@ class TLClassifier(object):
         self.__model_loaded = True
         rospy.loginfo("Successfully loaded model")
 
-    def get_classification(self, image, min_score=0.3):
+    def get_classification(self, image, min_score=0.5):
         """Determines the color of the traffic light in the image
         Args:
             image (cv::Mat): image containing the traffic light
@@ -58,24 +59,37 @@ class TLClassifier(object):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_np = np.expand_dims(np.asarray(image, dtype=np.uint8), 0)
 
-        scores, classes, num = self.do_computation(image_np)
+        boxes, scores, classes, num = self.do_computation(image_np)
 
         # Removing unecessary dimensions
+        boxes = np.squeeze(boxes)
         scores = np.squeeze(scores)
         classes = np.squeeze(classes).astype(np.int32)
 
-        # throwing away results below thershold
-        final_scores, final_classes = get_final_results(min_score, scores, classes)
+        for j, box in enumerate(boxes):
+            width = (box[3] - box[1]) * image.shape[1]
+            height = (box[2] - box[0]) * image.shape[0]
 
-        if len(final_classes) == 0:
-            rospy.loginfo("No traffic light is detected")
-            return TrafficLight.UNKNOWN
+            # skip if traffic light image is less than 50px - too far or nonexistent
+            if height < 50:
+                if IS_DEBUG:
+                    rospy.loginfo("No traffic light or too far away")
+                return TrafficLight.UNKNOWN
+            else:
+                # throwing away results below threshold
+                final_scores, final_classes = get_final_results(min_score, scores, classes)
 
-        # TrafficLight messages have red = 0, yellow = 1, green = 2.
-        # The model is trained to identify class red = 1, yellow = 2, green = 3.
-        # so, subtracting 1 to match with TrafficLight message spec.
-        rospy.loginfo("Predicted TFL color is " + tfl_type[final_classes[0] - 1] + " and score is " + str(final_scores[0]))
-        return final_classes[0] - 1
+                if len(final_classes) == 0:
+                    if IS_DEBUG:
+                        rospy.loginfo("No traffic light is detected")
+                    return TrafficLight.UNKNOWN
+
+                # TrafficLight messages have red = 0, yellow = 1, green = 2.
+                # The model is trained to identify class red = 1, yellow = 2, green = 3.
+                # so, subtracting 1 to match with TrafficLight message spec.
+                if IS_DEBUG:
+                    rospy.loginfo("Predicted TFL color is " + tfl_type[final_classes[0] - 1] + " and score is " + str(final_scores[0]))
+                return final_classes[0] - 1
 
     def do_computation(self, image_np):
         # Declaring our placeholders
@@ -89,13 +103,16 @@ class TLClassifier(object):
 
         # Classification of the object (integer id)
         detection_classes = self.tf_graph.get_tensor_by_name('prefix/detection_classes:0')
+
+        detection_boxes = self.tf_graph.get_tensor_by_name('prefix/detection_boxes:0')
+
         # Get the scores, classes and number of detections
         # re-use the session: it is more than 3x faster than creating a new one for every image
-        (scores, classes, num) = self.tf_session.run(
-            [detection_scores, detection_classes, num_detections],
+        (boxes, scores, classes, num) = self.tf_session.run(
+            [detection_boxes, detection_scores, detection_classes, num_detections],
             feed_dict={image_tensor: image_np})
 
-        return scores, classes, num
+        return boxes, scores, classes, num
 
 
 def load_graph (graph_file):
@@ -109,11 +126,12 @@ def load_graph (graph_file):
     return graph
 
 
-def get_final_results(min_score, scores, classes):   
+def get_final_results(min_score, scores, classes):
     indexes = []
     for i in range(len(classes)):
         if scores[i] >= min_score:
             indexes.append(i)
+
 
     final_scores = scores[indexes, ...]
     final_classes = classes[indexes, ...]
