@@ -24,7 +24,9 @@ class TLDetector(object):
         self.waypoints_tree = None
         self.camera_image = None
         self.lights = []
-        self.light_classifier = TLClassifier() # Need to initialize classifier first to avoid callback errors
+        config_string = rospy.get_param("/traffic_light_config")
+        self.config = yaml.load(config_string)
+        self.light_classifier = TLClassifier(self.config['is_site']) # Need to initialize classifier first to avoid callback errors
 
         # True == Use traffic data from /vehicles/traffic_lights. False to detect.
         self.USE_GROUND_TRUTH_TRAFFIC_LIGHT = False
@@ -42,8 +44,7 @@ class TLDetector(object):
         sub3 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
         sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
 
-        config_string = rospy.get_param("/traffic_light_config")
-        self.config = yaml.load(config_string)
+
 
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
